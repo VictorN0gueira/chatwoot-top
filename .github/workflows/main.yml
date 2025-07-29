@@ -1,0 +1,32 @@
+# Nome do Workflow
+name: Build and Push Docker Image to Docker Hub
+
+# Gatilho: Executa sempre que houver um 'push' na branch 'develop'
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest # Usa uma máquina virtual Ubuntu para executar os passos
+
+    steps:
+      # 1. Pega o seu código do repositório
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      # 2. Faz o login no Docker Hub usando os Secrets que você configurou
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Constrói a imagem Docker e envia para o Docker Hub
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Nomeia a imagem. Ex: victornogueira/chatwoot-top:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/chatwoot-top:latest
